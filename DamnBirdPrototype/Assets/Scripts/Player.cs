@@ -2,85 +2,107 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour 
+public class Player : MonoBehaviour
 {
-	[Header("General Settings")]
+    [Header("General Settings")]
 
-	[SerializeField]
-	private int chipsThrown = 1;
+    [SerializeField]
+    private int chipsThrown = 1;
 
-	[SerializeField]
-	private GameObject chip;
+    [SerializeField]
+    private float throwForce = 0;
 
-	[SerializeField]
-	private Transform spawnPoint;
+    [SerializeField]
+    [Range(0, 100)]
+    private float minThrowForce = 10;
 
+    [SerializeField]
+    [Range(0, 100)]
+    private float maxThrowForce = 10;
 
-	[Header("Camera Settings")]
-	[SerializeField]
-	[Range(0.1f, 5)]
-	private float mouseSensitivity = 0f;
+    [SerializeField]
+    private float forceGrowthRate = 5;
 
-	private Camera myCamera = null;
+    [SerializeField]
+    private GameObject chip;
 
-	private float xAxisClamp = 0;
+    [SerializeField]
+    private Transform spawnPoint;
 
-	private void Awake()
-	{
-		myCamera = GetComponentInChildren<Camera>();
-	}
+    [Header("Camera Settings")]
+    [SerializeField]
+    [Range(0.1f, 5)]
+    private float mouseSensitivity = 0f;
 
-	private void Update()
-	{
-		Cursor.lockState = CursorLockMode.Locked;
+    private Camera myCamera = null;
 
-		RotateCamera();
+    private float xAxisClamp = 0;
 
-		if(Input.GetMouseButtonDown(0))
-		{
-			Throw ();
-		}
-	}
+    private void Awake()
+    {
+        myCamera = GetComponentInChildren<Camera>();
+    }
 
-	private void Throw()
-	{
-		for(int i = 0; i < chipsThrown; i++)
-		{
-			Instantiate (chip, spawnPoint.position, Quaternion.identity);
-		}
-	}
+    private void Update()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
 
-	private void RotateCamera()
-	{
-		float mouseX = Input.GetAxis("Mouse X");
-		float mouseY = Input.GetAxis("Mouse Y");
+        RotateCamera();
 
-		float rotAmountX = mouseX * mouseSensitivity;
-		float rotAmountY = mouseY * mouseSensitivity;
+        if (Input.GetMouseButton(0))
+        {
+            throwForce += forceGrowthRate * Time.deltaTime;
 
-		xAxisClamp -= rotAmountY;
+            throwForce = Mathf.Clamp(throwForce, minThrowForce, maxThrowForce);
+        }
 
-		Vector3 targetRotCam = myCamera.transform.eulerAngles;
-		Vector2 targetRotBody = transform.rotation.eulerAngles;
+        if (Input.GetMouseButtonUp(0))
+        {
+            Throw();
+            throwForce = minThrowForce;
+        }
+    }
 
-		targetRotCam.x -= rotAmountY;
+    private void Throw()
+    {
+        for (int i = 0; i < chipsThrown; i++)
+        {
+            Rigidbody rb = Instantiate(chip, spawnPoint.position, spawnPoint.rotation).GetComponent<Rigidbody>();
+            rb.AddForce(rb.transform.forward * throwForce, ForceMode.Impulse);
+        }
+    }
 
-		if (xAxisClamp > 90)
-		{
-			xAxisClamp = 90;
-			targetRotCam.x = 90;
-		}
-		else if (xAxisClamp < -90)
-		{
-			xAxisClamp = -90;
-			targetRotCam.x = 270;
-		}
+    private void RotateCamera()
+    {
+        float mouseX = Input.GetAxis("Mouse X");
+        float mouseY = Input.GetAxis("Mouse Y");
 
-		targetRotCam.z = 0f;
+        float rotAmountX = mouseX * mouseSensitivity;
+        float rotAmountY = mouseY * mouseSensitivity;
 
-		targetRotBody.y += rotAmountX;
+        xAxisClamp -= rotAmountY;
 
-		myCamera.transform.rotation = Quaternion.Euler(targetRotCam);
-		transform.rotation = Quaternion.Euler(targetRotBody);
-	}
+        Vector3 targetRotCam = myCamera.transform.eulerAngles;
+        Vector2 targetRotBody = transform.rotation.eulerAngles;
+
+        targetRotCam.x -= rotAmountY;
+
+        if (xAxisClamp > 90)
+        {
+            xAxisClamp = 90;
+            targetRotCam.x = 90;
+        }
+        else if (xAxisClamp < -90)
+        {
+            xAxisClamp = -90;
+            targetRotCam.x = 270;
+        }
+
+        targetRotCam.z = 0f;
+
+        targetRotBody.y += rotAmountX;
+
+        myCamera.transform.rotation = Quaternion.Euler(targetRotCam);
+        transform.rotation = Quaternion.Euler(targetRotBody);
+    }
 }

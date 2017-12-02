@@ -51,7 +51,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\SceneManagement\Fading.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
+     <Compile Include="Assets\Scripts\SceneManagement\LevelLoader.cs" />
+     <Compile Include="Assets\SingletonGameManager\AudioManager.cs" />
+     <Compile Include="Assets\SingletonGameManager\Loader.cs" />
+     <Compile Include="Assets\SingletonGameManager\Manager.cs" />
+     <Compile Include="Assets\SingletonGameManager\SoundBank.cs" />
+     <None Include="Assets\Sounds\deleteMe.txt" />
+     <None Include="Assets\Sprites\deleteMe.txt" />
+     <None Include="Assets\Music\deleteMe.txt" />
+     <None Include="Assets\Textures\deleteMe.txt" />
+     <None Include="Assets\Models\deleteMe.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
